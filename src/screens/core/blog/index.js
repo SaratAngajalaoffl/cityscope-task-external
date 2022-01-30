@@ -2,10 +2,16 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import MDEditor from "@uiw/react-md-editor";
 import LoadingComponent from "../../../components/loading";
-import { getBlog, likeBlog } from "../../../services/blogs-service";
+import { commentBlog, getBlog, likeBlog } from "../../../services/blogs-service";
 import dayjs from "dayjs";
 import { Grid, IconButton, Input, InputAdornment } from "@mui/material";
 import FavouriteIcon from "@mui/icons-material/Favorite";
+import List from "@mui/material/List";
+import ListItem from "@mui/material/ListItem";
+import ListItemText from "@mui/material/ListItemText";
+import ListItemAvatar from "@mui/material/ListItemAvatar";
+import Avatar from "@mui/material/Avatar";
+import ImageIcon from "@mui/icons-material/Image";
 import CommentIcon from "@mui/icons-material/Comment";
 import SendIcon from "@mui/icons-material/Send";
 import { useAuth } from "../../../components/contexts/AuthContext";
@@ -50,6 +56,21 @@ function BlogScreen() {
 		}
 	};
 
+	const handleComment = async () => {
+		try {
+			const { data, error } = commentBlog(blogId, activeComment);
+
+			if (!!error) return console.log(error);
+
+			setBlog(data.data);
+
+			setLoading(false);
+		} catch (err) {
+			console.log(err);
+			setLoading(false);
+		}
+	};
+
 	if (loading) return <LoadingComponent />;
 
 	return (
@@ -79,13 +100,26 @@ function BlogScreen() {
 				onChange={(e) => setActiveComment(e.target.value)}
 				endAdornment={
 					<InputAdornment>
-						<IconButton>
+						<IconButton onClick={handleComment}>
 							<SendIcon color="primary" />
 						</IconButton>
 					</InputAdornment>
 				}
 			/>
-			{blog.comments.map(() => Comment.title)}
+			<List sx={{ width: "100%", maxWidth: 360, bgcolor: "background.paper" }}>
+				{blog.comments.map((comment) => (
+					<>
+						<ListItem>
+							<ListItemAvatar>
+								<Avatar>
+									<ImageIcon />
+								</Avatar>
+							</ListItemAvatar>
+							<ListItemText primary={comment.comment} secondary={dayjs(comment.updatedAt).fromNow()} />
+						</ListItem>
+					</>
+				))}
+			</List>
 		</div>
 	);
 }

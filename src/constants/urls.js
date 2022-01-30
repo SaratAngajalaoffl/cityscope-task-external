@@ -25,3 +25,5 @@ export const EDIT_BLOG = `${BLOGS_BASE}/edit-blog`;
 export const GET_BLOG = `${BLOGS_BASE}/get-blog`;
 
 export const LIKE_BLOG = `${BLOGS_BASE}/like-blog`;
+
+export const COMMENT_BLOG = `${BLOGS_BASE}/comment-blog`;
