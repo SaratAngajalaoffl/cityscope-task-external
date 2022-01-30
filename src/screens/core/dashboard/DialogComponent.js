@@ -1,13 +1,16 @@
-import React, { useState } from "react";
-import Button from "@mui/material/Button";
-import Dialog from "@mui/material/Dialog";
-import DialogActions from "@mui/material/DialogActions";
-import DialogContent from "@mui/material/DialogContent";
-import DialogContentText from "@mui/material/DialogContentText";
+import * as React from "react";
+import Avatar from "@mui/material/Avatar";
+import List from "@mui/material/List";
+import ListItem from "@mui/material/ListItem";
+import ListItemAvatar from "@mui/material/ListItemAvatar";
+import ListItemText from "@mui/material/ListItemText";
 import DialogTitle from "@mui/material/DialogTitle";
-import { Grid, MenuItem, TextField } from "@mui/material";
-import { createBlog } from "../../../services/blogs-service";
-import { useHistory } from "react-router-dom";
+import Dialog from "@mui/material/Dialog";
+import PersonIcon from "@mui/icons-material/Person";
+import AddIcon from "@mui/icons-material/Add";
+import { blue } from "@mui/material/colors";
+import { deleteCookie, getCookie, saveCookie } from "../../../helpers/storage-helper";
+import { useHistory, useLocation } from "react-router-dom";
 
 export const CITIES = [
 	"Adilabad",
@@ -35,76 +38,31 @@ export const CITIES = [
 	"Kadapa",
 ];
 
-const BLOG_CATEGORIES = ["Employment", "Tourism", "Culture", "Finance", "Housing"];
-
-function DialogComponent({ open, handleClose, setLoading }) {
-	const [city, setCity] = useState(CITIES[0]);
-	const [category, setCategory] = useState(BLOG_CATEGORIES[0]);
-
+function DialogComponent() {
+	const [open] = React.useState(getCookie("city")?.length <= 0);
+	const { pathname } = useLocation();
 	const history = useHistory();
 
-	const handleCreateBlog = async () => {
-		try {
-			setLoading(true);
+	const handleClose = () => {
+		deleteCookie("city");
+	};
 
-			const { data, error } = await createBlog({ city, category });
-
-			if (!!error) return console.log(error);
-
-			history.push(`/edit/${data.data._id}`);
-
-			setLoading(false);
-		} catch (err) {
-			console.log(err);
-			setLoading(false);
-		}
+	const handleListItemClick = (value) => {
+		saveCookie("city", value);
+		history.push("/dashboard");
+		window.location.reload();
 	};
 
 	return (
-		<Dialog open={open} onClose={handleClose} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
-			<DialogTitle id="alert-dialog-title">{"Select demographics for the blog"}</DialogTitle>
-			<DialogContent>
-				<DialogContentText id="alert-dialog-description">
-					<Grid container>
-						<Grid item xs={12}>
-							<TextField
-								fullWidth
-								id="outlined-select-currency"
-								select
-								value={city}
-								onChange={(e) => setCity(e.target.value)}
-								helperText="Select Demographic City"
-							>
-								{CITIES.map((option) => (
-									<MenuItem key={option} value={option}>
-										{option}
-									</MenuItem>
-								))}
-							</TextField>
-						</Grid>
-						<Grid item xs={12}>
-							<TextField
-								id="outlined-select-currency"
-								fullWidth
-								select
-								value={category}
-								onChange={(e) => setCategory(e.target.value)}
-								helperText="Select Category"
-							>
-								{BLOG_CATEGORIES.map((option) => (
-									<MenuItem key={option} value={option}>
-										{option}
-									</MenuItem>
-								))}
-							</TextField>
-						</Grid>
-					</Grid>
-				</DialogContentText>
-			</DialogContent>
-			<DialogActions>
-				<Button onClick={handleClose}>Cancel</Button>
-				<Button onClick={handleCreateBlog}>Create</Button>
-			</DialogActions>
+		<Dialog onClose={handleClose} open={pathname.indexOf("select-city") > -1 || open}>
+			<DialogTitle>Select City</DialogTitle>
+			<List sx={{ pt: 0 }}>
+				{CITIES.map((email) => (
+					<ListItem button onClick={() => handleListItemClick(email)} key={email}>
+						<ListItemText primary={email} />
+					</ListItem>
+				))}
+			</List>
 		</Dialog>
 	);
 }

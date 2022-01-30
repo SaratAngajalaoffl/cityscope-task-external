@@ -22,7 +22,7 @@ function BlogScreen() {
 
 	const [loading, setLoading] = useState(true);
 	const [blog, setBlog] = useState();
-	const [activeComment, setActiveComment] = useState();
+	const [activeComment, setActiveComment] = useState("");
 
 	useEffect(() => {
 		(async () => {
@@ -58,9 +58,11 @@ function BlogScreen() {
 
 	const handleComment = async () => {
 		try {
-			const { data, error } = commentBlog(blogId, activeComment);
+			const { data, error } = await commentBlog(blogId, activeComment);
 
 			if (!!error) return console.log(error);
+
+			setActiveComment("");
 
 			setBlog(data.data);
 
@@ -79,7 +81,6 @@ function BlogScreen() {
 			<h4 style={{ color: "grey" }}>Posted {dayjs(blog.createdAt).fromNow()}</h4>
 			<div style={{ height: 30 }} />
 			<MDEditor.Markdown source={blog.body} />
-			{/* {JSON.stringify(auth)} */}
 			<h3 style={{ color: "#333333", textAlign: "center", margin: 20 }}> - - - XXX - - -</h3>
 			<Grid container spacing={3} alignItems="center" style={{ marginLeft: -5 }}>
 				<IconButton onClick={handleLike}>
@@ -99,7 +100,7 @@ function BlogScreen() {
 				value={activeComment}
 				onChange={(e) => setActiveComment(e.target.value)}
 				endAdornment={
-					<InputAdornment>
+					<InputAdornment position="end">
 						<IconButton onClick={handleComment}>
 							<SendIcon color="primary" />
 						</IconButton>
@@ -107,17 +108,15 @@ function BlogScreen() {
 				}
 			/>
 			<List sx={{ width: "100%", maxWidth: 360, bgcolor: "background.paper" }}>
-				{blog.comments.map((comment) => (
-					<>
-						<ListItem>
-							<ListItemAvatar>
-								<Avatar>
-									<ImageIcon />
-								</Avatar>
-							</ListItemAvatar>
-							<ListItemText primary={comment.comment} secondary={dayjs(comment.updatedAt).fromNow()} />
-						</ListItem>
-					</>
+				{blog.comments.map((comment, ind) => (
+					<ListItem key={ind}>
+						<ListItemAvatar>
+							<Avatar>
+								<ImageIcon />
+							</Avatar>
+						</ListItemAvatar>
+						<ListItemText primary={comment.comment} secondary={dayjs(comment.updatedAt).fromNow()} />
+					</ListItem>
 				))}
 			</List>
 		</div>

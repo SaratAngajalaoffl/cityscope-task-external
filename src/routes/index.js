@@ -8,8 +8,6 @@ import AuthRoutes from "./AuthRoutes";
 const RouteHandler = () => {
 	const { auth } = useAuth();
 
-	console.log(auth);
-
 	if (!auth) return <AuthRoutes />;
 
 	if (auth.type === "INTERNAL" || auth.type === "EXTERNAL") return <BlogRoutes />;

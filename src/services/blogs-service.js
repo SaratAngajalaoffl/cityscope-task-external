@@ -2,9 +2,9 @@ import { COMMENT_BLOG, CREATE_BLOG, EDIT_BLOG, GET_BLOG, GET_DASHBOARD, GET_DRAF
 import { getRequest, postRequest } from "../helpers/axios-helper";
 import { attachParams } from "../helpers/misc_helper";
 
-export const getDashboard = async () => {
+export const getDashboard = async (filters) => {
 	return await getRequest({
-		url: attachParams(GET_DASHBOARD),
+		url: attachParams(GET_DASHBOARD, filters),
 		noAuth: true,
 	});
 };
